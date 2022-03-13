@@ -1,19 +1,14 @@
-import {
-  Request,
-  Controller,
-  Post,
-  UseGuards,
-  Body,
-  Get,
-} from '@nestjs/common';
+import { Controller, Post, Request, UseGuards } from '@nestjs/common';
 import {
   ApiBadRequestResponse,
+  ApiBearerAuth,
   ApiBody,
   ApiOkResponse,
   ApiOperation,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
 import { AuthService } from './auth/auth.service';
+import { JwtAuthGuard } from './auth/guards/jwtAuth.guard';
 import { LocalAuthGuard } from './auth/guards/localAuth.guard';
 import { SignInDto } from './dtos/sign-in.dto';
 import { SignInResponse } from './types';
@@ -54,5 +49,15 @@ export class AppController {
   @Post('/sign-in')
   signIn(@Request() req): SignInResponse {
     return this.authService.login(req.user);
+  }
+
+  @ApiUnauthorizedResponse({
+    description: 'returns unauthorized when there is no JWT or JWT is invalid',
+  })
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
+  @Post('/generate-key-pair')
+  generateKeyPair(@Request() req) {
+    return req.user;
   }
 }
