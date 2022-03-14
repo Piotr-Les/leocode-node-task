@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { KeyGenService } from 'src/key-gen/key-gen.service';
+import { KeyGenService } from 'src/key/key-gen.service';
 
 export interface UserKeyPair {
   userId: number;
@@ -14,7 +14,7 @@ export class KeyVaultService {
     this.keys = [];
   }
 
-  private getKeys(userId: number): Omit<UserKeyPair, 'userId'> | undefined {
+  getKeys(userId: number): Omit<UserKeyPair, 'userId'> | undefined {
     const key = this.keys.find((key) => key.userId === userId);
     if (key) {
       const { userId, ...result } = key;

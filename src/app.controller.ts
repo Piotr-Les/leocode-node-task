@@ -12,7 +12,7 @@ import { AuthService } from './auth/auth.service';
 import { JwtAuthGuard } from './auth/guards/jwtAuth.guard';
 import { LocalAuthGuard } from './auth/guards/localAuth.guard';
 import { SignInDto } from './dtos/sign-in.dto';
-import { KeyVaultService } from './key-vault/key-vault.service';
+import { KeyVaultService } from './key/key-vault.service';
 import { GenerateRSAKeyPairResponse, SignInResponse } from './types';
 
 @Controller('/api')
@@ -75,5 +75,5 @@ export class AppController {
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
   @Post('/encrypt')
-  encryptFile() {}
+  encryptFile(@Request() req) {}
 }

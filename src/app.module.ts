@@ -2,8 +2,8 @@ import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { AppController } from './app.controller';
 import { AuthModule } from './auth/auth.module';
-import { KeyGenModule } from './key-gen/key-gen.module';
-import { KeyVaultModule } from './key-vault/key-vault.module';
+import { FileModule } from './file/file.module';
+import { KeyModule } from './key/key.module';
 import { UsersModule } from './users/users.module';
 
 @Module({
@@ -11,8 +11,8 @@ import { UsersModule } from './users/users.module';
     AuthModule,
     UsersModule,
     ConfigModule.forRoot(),
-    KeyGenModule,
-    KeyVaultModule,
+    KeyModule,
+    FileModule,
   ],
   controllers: [AppController],
 })
