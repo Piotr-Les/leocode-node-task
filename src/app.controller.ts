@@ -11,7 +11,7 @@ import { AuthService } from './auth/auth.service';
 import { JwtAuthGuard } from './auth/guards/jwtAuth.guard';
 import { LocalAuthGuard } from './auth/guards/localAuth.guard';
 import { SignInDto } from './dtos/sign-in.dto';
-import { SignInResponse } from './types';
+import { GenerateRSAKeyPairResponse, SignInResponse } from './types';
 
 @Controller('/api')
 export class AppController {
@@ -51,13 +51,21 @@ export class AppController {
     return this.authService.login(req.user);
   }
 
+  @ApiOkResponse({
+    type: GenerateRSAKeyPairResponse,
+    description: 'returns a RSA key pair (2048 bits)',
+  })
   @ApiUnauthorizedResponse({
-    description: 'returns unauthorized when there is no JWT or JWT is invalid',
+    description:
+      'returns unauthorized when there is no JWT provided in header or the JWT provided is invalid',
   })
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
   @Post('/generate-key-pair')
-  generateKeyPair(@Request() req) {
-    return req.user;
-  }
+  generateKeyPair(@Request() req) {}
+
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
+  @Post('/encrypt')
+  encryptFile() {}
 }
