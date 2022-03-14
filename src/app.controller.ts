@@ -3,6 +3,7 @@ import {
   ApiBadRequestResponse,
   ApiBearerAuth,
   ApiBody,
+  ApiCreatedResponse,
   ApiOkResponse,
   ApiOperation,
   ApiUnauthorizedResponse,
@@ -11,11 +12,15 @@ import { AuthService } from './auth/auth.service';
 import { JwtAuthGuard } from './auth/guards/jwtAuth.guard';
 import { LocalAuthGuard } from './auth/guards/localAuth.guard';
 import { SignInDto } from './dtos/sign-in.dto';
+import { KeyVaultService } from './key-vault/key-vault.service';
 import { GenerateRSAKeyPairResponse, SignInResponse } from './types';
 
 @Controller('/api')
 export class AppController {
-  constructor(private authService: AuthService) {}
+  constructor(
+    private authService: AuthService,
+    private keyVaultService: KeyVaultService,
+  ) {}
 
   @ApiOperation({ summary: 'User sign in endpoint' })
   @ApiOkResponse({
@@ -51,9 +56,10 @@ export class AppController {
     return this.authService.login(req.user);
   }
 
-  @ApiOkResponse({
+  @ApiCreatedResponse({
     type: GenerateRSAKeyPairResponse,
-    description: 'returns a RSA key pair (2048 bits)',
+    description:
+      'saves RSA key pair (2048 bits) to vault and returns them back',
   })
   @ApiUnauthorizedResponse({
     description:
@@ -62,7 +68,9 @@ export class AppController {
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
   @Post('/generate-key-pair')
-  generateKeyPair(@Request() req) {}
+  generateKeyPair(@Request() req) {
+    return this.keyVaultService.handleKeys(req.user.id);
+  }
 
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
