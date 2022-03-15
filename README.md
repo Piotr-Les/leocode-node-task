@@ -1,7 +1,7 @@
 ## Description
 
 Node recruitment task.
-The API has 3 endpoints and swagger docs available on
+The API has 3 endpoints and a swagger docs available on
 `http://localhost:3000/docs`
 
 ## Installation
