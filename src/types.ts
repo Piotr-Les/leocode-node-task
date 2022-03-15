@@ -13,6 +13,11 @@ export class GenerateRSAKeyPairResponse {
   privKey: string;
 }
 
+export class EncryptFileResponse {
+  @ApiProperty()
+  encryptedFile: string;
+}
+
 export interface UserData {
   id: number;
   email: string;

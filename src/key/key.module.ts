@@ -4,6 +4,6 @@ import { KeyVaultService } from './key-vault.service';
 
 @Module({
   providers: [KeyVaultService, KeyGenService],
-  exports: [KeyVaultService],
+  exports: [KeyVaultService, KeyGenService],
 })
 export class KeyModule {}

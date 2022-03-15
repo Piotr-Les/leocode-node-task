@@ -1,9 +1,17 @@
-import { Controller, Post, Request, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  Header,
+  HttpCode,
+  Post,
+  Request,
+  UseGuards,
+} from '@nestjs/common';
 import {
   ApiBadRequestResponse,
   ApiBearerAuth,
   ApiBody,
   ApiCreatedResponse,
+  ApiNotFoundResponse,
   ApiOkResponse,
   ApiOperation,
   ApiUnauthorizedResponse,
@@ -12,26 +20,32 @@ import { AuthService } from './auth/auth.service';
 import { JwtAuthGuard } from './auth/guards/jwtAuth.guard';
 import { LocalAuthGuard } from './auth/guards/localAuth.guard';
 import { SignInDto } from './dtos/sign-in.dto';
+import { FileService } from './file/file.service';
 import { KeyVaultService } from './key/key-vault.service';
-import { GenerateRSAKeyPairResponse, SignInResponse } from './types';
+import {
+  EncryptFileResponse,
+  GenerateRSAKeyPairResponse,
+  SignInResponse,
+} from './types';
 
 @Controller('/api')
 export class AppController {
   constructor(
     private authService: AuthService,
     private keyVaultService: KeyVaultService,
+    private fileService: FileService,
   ) {}
 
   @ApiOperation({ summary: 'User sign in endpoint' })
   @ApiOkResponse({
     type: SignInResponse,
-    description: 'returns a JWT valid for 5 minutes',
+    description: 'Returns a JWT valid for 5 minutes',
   })
   @ApiUnauthorizedResponse({
-    description: 'returns unauthorized when passed credentials are invalid',
+    description: 'Returns unauthorized when passed credentials are invalid',
   })
   @ApiBadRequestResponse({
-    description: 'returns bad request when passed credentials are incomplete',
+    description: 'Returns bad request when passed credentials are incomplete',
   })
   @ApiBody({
     type: SignInDto,
@@ -52,18 +66,20 @@ export class AppController {
   })
   @UseGuards(LocalAuthGuard)
   @Post('/sign-in')
+  @HttpCode(200)
   signIn(@Request() req): SignInResponse {
     return this.authService.login(req.user);
   }
 
+  @ApiOperation({ summary: 'Generate RSA key pair endpoint' })
   @ApiCreatedResponse({
     type: GenerateRSAKeyPairResponse,
     description:
-      'saves RSA key pair (2048 bits) to vault and returns them back',
+      'Saves RSA key pair (2048 bits) to vault and returns them back',
   })
   @ApiUnauthorizedResponse({
     description:
-      'returns unauthorized when there is no JWT provided in header or the JWT provided is invalid',
+      'Returns unauthorized when there is no JWT provided in header or the JWT provided is invalid',
   })
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
@@ -72,8 +88,20 @@ export class AppController {
     return this.keyVaultService.handleKeys(req.user.id);
   }
 
+  @ApiOperation({ summary: 'Encrypt file endpoint' })
+  @ApiNotFoundResponse({
+    description: 'Returns not found when user has no rsa keys assigned',
+  })
+  @ApiOkResponse({
+    type: EncryptFileResponse,
+    description: 'Returns encrypted file as Base64 string',
+  })
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
   @Post('/encrypt')
-  encryptFile(@Request() req) {}
+  @HttpCode(200)
+  @Header('content-type', 'application/json')
+  async encryptFile(@Request() req) {
+    return await this.fileService.handleFile(req.user.id);
+  }
 }
