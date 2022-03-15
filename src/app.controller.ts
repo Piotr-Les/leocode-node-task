@@ -92,6 +92,10 @@ export class AppController {
   @ApiNotFoundResponse({
     description: 'Returns not found when user has no rsa keys assigned',
   })
+  @ApiUnauthorizedResponse({
+    description:
+      'Returns unauthorized when there is no JWT provided in header or the JWT provided is invalid',
+  })
   @ApiOkResponse({
     type: EncryptFileResponse,
     description: 'Returns encrypted file as Base64 string',
